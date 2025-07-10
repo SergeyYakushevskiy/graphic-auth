@@ -8,13 +8,15 @@
     <body>
         <h2>Вход в систему</h2>
         <form method="post">
-            <label for="login">Логин</label><br/>
-            <input type="text" id="login" name="login" required autocomplete="username" /><br/><br/>
+            <label for="login">Логин или почта</label><br/>
+            <input type="text" id="login" name="login" required autocomplete="username" /><br/>
 
             <label for="password">Пароль</label><br/>
             <input type="password" id="password" name="password" required autocomplete="current-password" /><br/><br/>
 
-            <button type="submit">Войти</button>
+            <button type="submit">Войти</button><br/>
+            <label>Ещё не зарегистрированы?</label>
+            <button onclick="window.location.href='/register'">Зарегистрироваться</button>
         </form>
     </body>
 </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Двухфакторная аутентификация — PassPoints</title>
+        <link rel="stylesheet" href="./css/two-factor.css" />
+    </head>
+    <body>
+        <h1>Двухфакторная аутентификация — PassPoints</h1>
+        <p>Кликните на изображение в 5 точках, чтобы подтвердить вход.</p>
+
+        <form id="passpoints-form" method="post" action="/two-factor/verify">
+            <!-- Здесь будут динамически создаваться скрытые поля с координатами -->
+            <input type="hidden" name="points" id="points-input" />
+
+            <img src="/images/passpoints-background.png" id="passpoints-image" alt="PassPoints image" />
+
+            <div id="points-list">Выбранные точки: <span id="points-display">нет</span></div>
+
+            <button type="submit" id="submit-btn" disabled>Подтвердить</button>
+            <button type="button" id="reset-btn">Сбросить</button>
+        </form>
+    </body>
+</html>

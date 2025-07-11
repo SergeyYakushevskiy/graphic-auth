@@ -7,9 +7,9 @@
     </head>
     <body>
         <h2>Вход в систему</h2>
-        <form method="post">
-            <label for="login">Логин или почта</label><br/>
-            <input type="text" id="login" name="login" required autocomplete="username" /><br/>
+        <form id="loginForm">
+            <label for="identifier">Логин или почта</label><br/>
+            <input type="text" id="identifier" name="identifier" required autocomplete="username" /><br/>
 
             <label for="password">Пароль</label><br/>
             <input type="password" id="password" name="password" required autocomplete="current-password" /><br/><br/>
@@ -18,5 +18,6 @@
             <label>Ещё не зарегистрированы?</label>
             <button onclick="window.location.href='/register'">Зарегистрироваться</button>
         </form>
+        <script src="./js/login.js"></script>
     </body>
 </html>

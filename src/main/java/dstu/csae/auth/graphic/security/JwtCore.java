@@ -1,5 +1,6 @@
 package dstu.csae.auth.graphic.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -21,6 +22,9 @@ public class JwtCore {
     @Value("${app.secret.expirationMs}")
     @Getter
     private int lifetime;
+    @Value("${app.2fa.expirationMs}")
+    @Getter
+    private int lifetime2Fa;
 
     private Key getSigningKey() {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
@@ -33,12 +37,23 @@ public class JwtCore {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String generate2FaToken(Authentication authentication){
+        AccountDetailsImpl userDetails = (AccountDetailsImpl) authentication.getPrincipal();
+        return Jwts.builder()
+                .subject(userDetails.getIdentifier())
+                .claim("purpose", "2fa")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + lifetime))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public String generateToken(Authentication authentication){
         AccountDetailsImpl userDetails = (AccountDetailsImpl) authentication.getPrincipal();
         return Jwts.builder()
-                .setSubject(userDetails.getIdentifier())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + lifetime))
+                .subject(userDetails.getIdentifier())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + lifetime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -51,5 +66,14 @@ public class JwtCore {
                 .getBody()
                 .getSubject();
     }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigningKey()) // secretKey = SecretKey или byte[]
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 
 }

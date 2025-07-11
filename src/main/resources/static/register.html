@@ -7,9 +7,12 @@
     </head>
     <body>
         <h2>Регистрация</h2>
-        <form method="post">
+        <form id="register-form">
             <label for="login">Логин</label><br/>
             <input type="text" id="login" name="login" required autocomplete="username" /><br/><br/>
+
+            <label for="mail">Электронная почта</label><br/>
+            <input type="text" id="mail" name="mail" required autocomplete="mail" /><br/><br/>
 
             <label for="password">Пароль</label><br/>
             <input type="password" id="password" name="password" required autocomplete="new-password" /><br/><br/>
@@ -25,5 +28,6 @@
 
             <button type="submit">Зарегистрироваться</button>
         </form>
+        <script src="./js/register.js"></script>
     </body>
 </html>

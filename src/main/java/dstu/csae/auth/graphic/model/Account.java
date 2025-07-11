@@ -16,6 +16,8 @@ import java.util.UUID;
 public class Account {
 
     @Id
+    @GeneratedValue
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 64)

@@ -25,7 +25,7 @@ public class AccountService implements UserDetailsService {
 
     @Override
     public AccountDetailsImpl loadUserByUsername(String login)
-            throws UsernameNotFoundException {
+            throws  RuntimeException {
         Account account = accountRepository.findByLogin(login).orElseThrow(
                 () -> new UsernameNotFoundException(
                         String.format("Пользователь с именем %s не найден", login))
@@ -49,7 +49,8 @@ public class AccountService implements UserDetailsService {
         return AccountDetailsImpl.build(account, email, passwordHash.getHash());
     }
 
-    public AccountDetailsImpl loadByIdentifier(String identifier) {
+    public AccountDetailsImpl loadByIdentifier(String identifier)
+            throws RuntimeException{
         if (identifier.matches("^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
             return loadUserByEmail(identifier);
         } else {

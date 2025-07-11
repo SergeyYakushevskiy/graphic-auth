@@ -9,7 +9,7 @@
         <h1>Двухфакторная аутентификация — PassPoints</h1>
         <p>Кликните на изображение в 5 точках, чтобы подтвердить вход.</p>
 
-        <form id="passpoints-form" method="post" action="/two-factor/verify">
+        <form id="passpoints-form">
             <!-- Здесь будут динамически создаваться скрытые поля с координатами -->
             <input type="hidden" name="points" id="points-input" />
 
@@ -20,5 +20,6 @@
             <button type="submit" id="submit-btn" disabled>Подтвердить</button>
             <button type="button" id="reset-btn">Сбросить</button>
         </form>
+        <script src="./js/two-factor.js"></script>
     </body>
 </html>

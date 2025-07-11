@@ -1,7 +1,9 @@
 package dstu.csae.auth.graphic.security;
 
 import dstu.csae.auth.graphic.service.AccountService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
@@ -57,13 +60,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (isPublicPath(request.getServletPath())) {
+        String requestPath = request.getServletPath();
+
+        if (isPublicPath(requestPath)) {
             filterChain.doFilter(request, response);
             return;
         }
+
         try {
-            // 1. Попытка получить JWT из cookie
             String jwt = null;
+            // 1. Попытка получить JWT из cookie
             if (request.getCookies() != null) {
                 for (var cookie : request.getCookies()) {
                     if ("jwt".equals(cookie.getName())) {
@@ -81,29 +87,59 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
             }
 
-            // 3. Проверяем и аутентифицируем пользователя по jwt
+            // 3. Обработка JWT, если найден
             if (jwt != null) {
-                String identifier = null;
+                Claims claims;
                 try {
-                    identifier = jwtCore.getNameFromJwt(jwt);
+                    claims = jwtCore.getClaims(jwt);
                 } catch (ExpiredJwtException e) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("JWT expired");
                     return;
+                } catch (JwtException e) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Неверный JWT");
+                    return;
                 }
+
+                String identifier = claims.getSubject();
+                String purpose = claims.get("purpose", String.class); // может быть null
+
                 if (identifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = accountService.loadByIdentifier(identifier);
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    if ("2fa".equals(purpose)) {
+                        // Временный токен — разрешаем только доступ к /two-factor
+                        if (!requestPath.startsWith("/two-factor")) {
+                            response.sendRedirect("/two-factor");
+                            return;
+                        }
+
+                        // Устанавливаем упрощённую аутентификацию (без authorities)
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                Collections.emptyList()
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    } else {
+                        // Полноценный токен
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         filterChain.doFilter(request, response);
     }
+
 }

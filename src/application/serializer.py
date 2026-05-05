@@ -1,7 +1,7 @@
 from src.domain.model import PassPointSequence
 
 
-COORD_PRECISION = 5
+COORD_PRECISION = 2
 POINT_TEMPLATE = "{x:.{prec}f}:{y:.{prec}f}"
 
 

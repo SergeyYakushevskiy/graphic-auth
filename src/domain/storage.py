@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 class SecretRepository(ABC):
 
     @abstractmethod
-    def save(self, user_id: str, verifier: bytes) -> None:
+    def save(self, user_id: str, background_id: str, verifier: bytes) -> None:
         pass
 
     @abstractmethod
-    def load(self, user_id: str) -> bytes | None:
+    def load(self, user_id: str) -> list | None:
         pass

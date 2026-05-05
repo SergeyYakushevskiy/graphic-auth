@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from math import sqrt
 from .model import Point, PassPointSequence
 
-MIN_SCALE: float = 1e-6
+MIN_SCALE: float = 0.03
+STEP = 0.08
 
 @dataclass(frozen=True)
 class TolerancePolicy:
@@ -24,4 +25,15 @@ class TolerancePolicy:
             for x, y in centered
         )
 
-        return PassPointSequence(norm)
+        return self._quantize(norm)
+
+    def _quantize(self, seq : tuple):
+        return PassPointSequence(
+            tuple(
+                Point(
+                    round(p.x / STEP) * STEP,
+                    round(p.y / STEP) * STEP
+                )
+                for p in seq
+            )
+        )

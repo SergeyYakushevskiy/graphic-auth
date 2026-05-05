@@ -11,7 +11,7 @@ from .types import AppConfig
 
 def load():
     env = os.getenv("APP_ENV", "dev")
-    project_dir = Path.cwd()
+    project_dir = Path.cwd().parent
 
     paths = resolve_paths(env, project_dir)
 

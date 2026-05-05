@@ -1,23 +1,27 @@
 from dataclasses import dataclass
 from math import isfinite, hypot
 
-EPS = 1e-5
+EPS = 10.0
 
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
 
+@dataclass(frozen=True)
+class UserAuthData:
+    user_id: str
+    background_id: str
+    verifier: bytes
 
 @dataclass(frozen=True)
 class PassPointSequence:
     points: tuple[Point, ...]
 
-    def __post_init__(self):
+    def validate(self):
         if len(self.points) < 3:
             raise ValueError("Too few points")
 
-        # проверка на корректность значений
         for p in self.points:
             if not (isfinite(p.x) and isfinite(p.y)):
                 raise ValueError("Non-finite coordinate detected")

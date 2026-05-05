@@ -9,6 +9,7 @@ from src.infrastructure.config.settings import AppSettings
 class Paths(BaseModel):
     base_dir: Path
     assets_dir: Path
+    img_dir: Path
     config_file: Path
     shadow_file: Path
     master_key_file: Path

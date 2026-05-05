@@ -1,4 +1,5 @@
 from src.application.model import PassPointsFingerprint
+from src.domain.crypto import MACPort, KDFPort, DigestPort
 from src.infrastructure.config.types import MasterKey
 
 STRING_ENCODING = 'utf-8'
@@ -7,13 +8,17 @@ VERSION = b"pp:v1" # версия алгоритма деривации
 
 class CryptoService:
 
-    def __init__(self, hasher, kdf, mac, master_key: MasterKey):
+    def __init__(self,
+                 hasher : DigestPort,
+                 kdf: KDFPort,
+                 mac : MACPort,
+                 master_key: MasterKey):
         self.hasher = hasher
         self.kdf = kdf
         self.mac = mac
         self.master_key = master_key
 
-    def derive_verifier(self, user_id: str, password: str, data: bytes):
+    def derive_verifier(self, user_id: str, password: str, data: bytes, background_id: str):
         """
         Функция формирования производной от аутентификационных данных
 
@@ -24,7 +29,7 @@ class CryptoService:
         4. KDF: усиление пароля (Argon2id)
         """
 
-        digest = self.hasher.digest(VERSION + data)
+        digest = self.hasher.digest(VERSION + background_id.encode() + data)
 
         mac_value = self.mac.compute(
             self.master_key.raw_key(),
